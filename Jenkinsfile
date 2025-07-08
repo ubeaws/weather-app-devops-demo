@@ -8,7 +8,12 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repo') {
+        stage('Debug') {
+	    steps {
+        	sh 'pwd && ls -l'
+   	    }
+	}	
+	stage('Clone Repo') {
             steps {
                 git branch: 'main', url: 'https://github.com/your-username/weather-app-devops-demo.git'
             }
