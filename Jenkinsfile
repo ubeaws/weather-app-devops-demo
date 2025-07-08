@@ -2,21 +2,21 @@ pipeline {
     agent any
 
     environment {
-       	PEM_FILE = "/var/lib/jenkins/.ssh/weatherapp.pem"
-	REMOTE_USER = 'ubuntu'
-        REMOTE_HOST = '100.27.130.81'
-        REMOTE_KEY = credentials('EC2_PRIVATE_KEY')  // Store your PEM key in Jenkins Credentials
+        PEM_FILE = "/var/lib/jenkins/.ssh/weatherapp.pem"
+        REMOTE_USER = "ubuntu"
+        REMOTE_HOST = "100.27.130.81"
     }
 
     stages {
         stage('Debug') {
-	    steps {
-        	sh 'pwd && ls -l'
-   	    }
-	}	
-	stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-username/weather-app-devops-demo.git'
+                sh 'pwd && ls -l'
+            }
+        }
+
+        stage('Clone Repo') {
+            steps {
+                git branch: 'main', url: 'https://github.com/ubeaws/weather-app-devops-demo.git'
             }
         }
 
@@ -35,7 +35,7 @@ pipeline {
         stage('Copy to EC2') {
             steps {
                 sh '''
-                scp -o StrictHostKeyChecking=no -i $REMOTE_KEY weather-app.tar $REMOTE_USER@$REMOTE_HOST:/home/ec2-user/
+                scp -o StrictHostKeyChecking=no -i $PEM_FILE weather-app.tar $REMOTE_USER@$REMOTE_HOST:/home/ubuntu/
                 '''
             }
         }
@@ -43,12 +43,12 @@ pipeline {
         stage('Deploy on EC2') {
             steps {
                 sh '''
-                ssh -o StrictHostKeyChecking=no -i $REMOTE_KEY $REMOTE_USER@$REMOTE_HOST << EOF
-                    docker load < weather-app.tar
+                ssh -o StrictHostKeyChecking=no -i $PEM_FILE $REMOTE_USER@$REMOTE_HOST << 'EOF'
+                    docker load < /home/ubuntu/weather-app.tar
                     docker stop weather-app || true
                     docker rm weather-app || true
                     docker run -d --name weather-app -p 80:3000 weather-app
-                EOF
+EOF
                 '''
             }
         }
