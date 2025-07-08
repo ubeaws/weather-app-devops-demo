@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        REMOTE_USER = 'ubuntu'
+       	PEM_FILE = "/var/lib/jenkins/.ssh/weatherapp.pem"
+	REMOTE_USER = 'ubuntu'
         REMOTE_HOST = '100.27.130.81'
         REMOTE_KEY = credentials('EC2_PRIVATE_KEY')  // Store your PEM key in Jenkins Credentials
     }
